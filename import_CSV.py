@@ -45,7 +45,7 @@ import urllib.parse #URIエンコード
 from PyQt5.QtWidgets import QFileDialog
 from qgis.gui import QgsProjectionSelectionDialog, QgsTableWidgetItem #CRS選択ダイアログ
 from qgis.core import QgsCoordinateReferenceSystem
-from qgis.PyQt.QtWidgets import QProgressBar
+from qgis.PyQt.QtWidgets import QProgressBar #プログレスバー
 
 
 
@@ -216,16 +216,9 @@ class ImportCSV:
             self.dlg.button_Folder_save.clicked.connect(self.OpenBrowse_save) #保存用フォルダ選択ボタン
             self.dlg.button_CRS.clicked.connect(self.CRSClicked) #CRS選択ボタン
             self.dlg.button_Import.clicked.connect(self.importClicked) #インポートボタン
-            #self.dlg.button_Import_atr.clicked.connect(self.import_atrClicked) #属性テーブルインポートボタン
-            #self.dlg.button_Pointlist.clicked.connect(self.PointClicked) #ポイントリストの表示ボタン            
             self.dlg.button_Singlepolygon.clicked.connect(self.SinglePolygonClicked) #レイヤを分けてポリゴン作成ボタン
-            #self.dlg.button_Polygon.clicked.connect(self.PolygonClicked) #一つのレイヤに全てのポリゴン作成ボタン            
             self.dlg.button_Multipolygon.clicked.connect(self.MultiPolygonClicked) #マルチポリゴン作成ボタン            
-            #self.dlg.button_Multipolygon_2.clicked.connect(self.Multi_2Clicked) #マルチポリゴン作成
-            #self.dlg.button_Layerlist.clicked.connect(self.LayerClicked) #レイヤリストの表示ボタン
             self.dlg.button_Shapefile.clicked.connect(self.ShapeClicked) #レイヤをシェープファイルとして保存ボタン
-            #self.dlg.comboBox_X.addItems(['abc', 'def', 'gef']) #X（経度）を選択するコンボボックス
-            #self.dlg.pushButton.clicked.connect(self.buttonClicked)  #指定のフォルダ内のファイルをインポート
             self.dlg.button_Help_import.clicked.connect(self.Help_importClicked) #インポートのヘルプボタン
             self.dlg.button_Help_polygon.clicked.connect(self.Help_polygonClicked) #ポリゴン作成のヘルプボタン
             self.dlg.button_Help_save.clicked.connect(self.Help_saveClicked) #シェープファイル保存のヘルプボタン
@@ -260,7 +253,6 @@ class ImportCSV:
     #フォルダ選択ダイアログを開くボタンの処理
     def OpenBrowse(self):         
         dir_path = QFileDialog.getExistingDirectory(None,None,'D:/')
-        #self.dlg.textBrowser_filelist.clear() #textBrowserの中身を初期化
         self.dlg.lineEdit_Folder.setText(str(dir_path))
         folder_text = self.dlg.lineEdit_Folder.text() #フォルダ選択ダイアログで選択したパスを取得
         dir_list = glob.glob(folder_text + "/*.csv") #ディレクトリ内のファイル一覧を取得
@@ -277,29 +269,13 @@ class ImportCSV:
                 self.dlg.tableWidget.setItem(r, 1, QgsTableWidgetItem(str(ret_dict['encoding']))) #文字コードカラムにセット                
             r += 1
        
-        """
-        for filename in dir_list: #ディレクトリ内のファイル一覧を取得
-            filename = os.path.split(filename)[1] #ファイル名のみ取得
-            self.dlg.textBrowser_filelist.append(str(filename)) #TextBrowserにファイル名を表示　setTextではなくてappendを使う
-        """
-                        
-        #filename1 = QFileDialog.getOpenFileName(None, None,'D:/Setup/QGISBatchTest','*.csv')    
-        # self.dialog.Input_TB.setText(filename1)   
-        # basename = os.path.basename(filename1)   
-        # self.dlg.textBrowser.setText(str(basename)) 
-
 
     # CRS選択ダイアログを開くボタンの処理    
     def CRSClicked(self):
         projSelector = QgsProjectionSelectionDialog() #CRS選択ダイアログを設定       
         projSelector.exec_() #ダイアログを開く
         self.dlg.lineEdit_CRS.setText(projSelector.crs().authid())
-                
-        #projection_selection_widget = QgsProjectionSelectionWidget()
-        #projection_selection_widget.resize(400, 30)
-        #projection_selection_widget.setCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
-        #projection_selection_widget.show()
-
+       
 
     #ファイル選択ダイアログで指定したファイルをインポートするボタンの処理
     def importClicked(self):      
@@ -350,50 +326,7 @@ class ImportCSV:
                 progress.setValue(p + 1) #プログレスバーのステップを進行                    
             progress.reset() #プログレスバーの進捗率をリセット
 
-    """
-    #属性テーブルをインポートするボタンの処理
-    def import_atrClicked(self):
-        folder_text = self.dlg.lineEdit_Folder.text() #フォルダ選択ダイアログで選択したパスを取得
-        for fname in glob.glob(folder_text + "/*.csv"): #ディレクトリ内のCSVファイルをQGISにインポート
-            import_path = urllib.parse.quote(folder_text) #uri文字にエンコード
-            fname = urllib.parse.quote(fname) #uri文字にエンコード            
-            uri ="file:///" + fname + "?encoding=Shift_JIS&delimiter={}".format (",")
-            fname = urllib.parse.unquote(fname) #uri文字をデコードして日本語に戻す
-            fname = os.path.split(fname)[1] #ファイル名のみ取得
-            name = fname.replace('.csv', '') #レイヤ名の設定　ファイル名から拡張子を削除           
-            lyr = QgsVectorLayer(uri, name + "_属性", 'delimitedtext') #ベクターレイヤの作成
-            QgsProject.instance().addMapLayer(lyr) #地図に追加
-    """
-
-    """
-    #ポイントリストを表示するボタンの処理
-    def PointClicked(self):
-        self.dlg.textBrowser_pointX.clear() #textBrowserの中身を初期化
-        self.dlg.textBrowser_pointY.clear() #textBrowserの中身を初期化
-        layer = self.iface.activeLayer() #アクティブレイヤを取得        
-        features = layer.getFeatures()
-        points = [] #空のリストを作成
-        for feat in features: #属性から緯度経度を取得
-                attrs = feat.attributes()
-                fieldname = layer.fields().names()
-                fieldcount = layer.fields().count()   
-                #r = range(fieldcount)
-                for i in range(1,3): #1からフィールドの数だけ繰り返し処理  
-                    x = fieldname.index("経度{}".format(i)) #経度のフィールドが何番目にあるかを取得
-                    y = fieldname.index("緯度{}".format(i)) #緯度のフィールドが何番目にあるかを取得
-                    a = [[attrs[x],attrs[y]]]
-                    points.append(a)
-                
-                    #points.append([[attrs[x],attrs[y]]]) #ポイント座標をリストに追加
-                
-        self.dlg.textBrowser_pointX.append(str(points))
-        #self.dlg.textBrowser_pointY.append(str(attrs[1]))
-
-        
-        
-    """
-
-                
+                    
     #ポリゴンを作成するボタンの処理
     def SinglePolygonClicked(self):
         crs_text = self.dlg.lineEdit_CRS.text() #CRS選択ダイアログで選択したCRSを取得
@@ -481,56 +414,7 @@ class ImportCSV:
                     
             QgsProject.instance().addMapLayer(polygonLayer) #地図に追加
             progress.reset() #プログレスバーの進捗率をリセット
-
-    """
-    #一つのレイヤに全てのポリゴンを作成するボタンの処理
-    def PolygonClicked(self):
-        layername_text = self.dlg.lineEdit_Layername.text() #レイヤ名に入力した文字を取得
-        crs_text = self.dlg.lineEdit_CRS.text() #CRS選択ダイアログで選択したCRSを取得
-        polygonLayer = QgsVectorLayer('Polygon?crs={}'.format(crs_text), layername_text + "_poly", 'memory') #スクラッチ（一時）レイヤを作成
-        layers = self.iface.mapCanvas().layers() # 追加されているレイヤのリストを取得
-        for layer in layers:
-            if layer.geometryType() == 0: #ジオメトリタイプがポイントのみ処理する
-                poly = QgsFeature(polygonLayer.fields()) #スクラッチレイヤの地物を取得？
-                points = [] #空のリストを作成
-                features = layer.getFeatures() #地物を取得
-                for feat in features: #属性から緯度経度を取得
-                    fieldname = layer.fields().names() #フィールド名を取得
-                    x = fieldname.index("経度") #経度のフィールドが何番目にあるのかを取得
-                    y = fieldname.index("緯度") #緯度のフィールドが何番目にあるのかを取得
-                    attrs = feat.attributes()
-                    points.append([attrs[x],attrs[y]])#ポイント座標をリストに追加                    
-                    dst = [] #NULLを削除したリストを入れるための、空のリスト作成
-                    for block in points:#リストからNULLを削除
-                        new_block = [x for x in block if x != NULL]
-                        dst.append(new_block)                
-                    list2 = [e for e in dst if e] #空になったリストを削除
-                    points = list2 #緯度経度フィールドの空のデータを削除したリストをpointsに入れる
-               
-            #self.dlg.textBrowser_pointY.append(str(points))
-
-                poly.setGeometry(QgsGeometry.fromPolygonXY([[QgsPointXY(x[0], x[1]) for x in points]])) #ポイント座標からポリゴンを作成
-                polygonLayer.dataProvider().addFeatures([poly]) #スクラッチレイヤにポリゴンの追加
-
-                polygonLayer.startEditing() #編集を有効にする
-                polygonLayer.dataProvider().addAttributes( [ #スクラッチレイヤにフィールドの追加
-                    QgsField('ID',  QVariant.Int),
-                    QgsField('ファイル名', QVariant.String),
-                    #QgsField('TestDouble', QVariant.Double)
-                    ] )
-                polygonLayer.updateFields() #フィールド追加の更新
-                features = polygonLayer.getFeatures() #地物を取得
-                #feature = next(vl.getFeatures())
-                #self.assertTrue(vl.changeAttributeValue(feature.id(), 1, 1001))
-                for feature in features:
-                    polygonLayer.changeAttributeValue(feature.id(), 0, feature.id()) #レコード、フィールド、変更内容
-                polygonLayer.changeAttributeValue(feature.id(), 1, layer.name()) #レコード、フィールド、変更内容
-                polygonLayer.commitChanges()
-                
-        QgsProject.instance().addMapLayer(polygonLayer) #地図に追加
-    """
-
-
+    
     
     #マルチポリゴンを作成するボタンの処理
     def MultiPolygonClicked(self):
@@ -660,23 +544,7 @@ class ImportCSV:
 
             QgsProject.instance().addMapLayer(polygonLayer) #地図に追加
             progress.reset() #プログレスバーの進捗率をリセット
-       
     
-
-
-
-    """
-    #レイヤパネルのレイヤ一覧を表示するボタンの処理
-    def LayerClicked(self):
-        layers = QgsProject.instance().layerTreeRoot().findLayers() #レイヤパネルのレイヤを取得する
-        for v in layers:
-            self.dlg.textBrowser_layerlist.append("レイヤ名： " + str(v.name())) 
-
-        
-        #layers = QgsProject.instance().layerTreeRoot().findLayers() #全てのレイヤをリストオブジェクトで取得
-        #layers = iface.mapCanvas().layers() # 追加されているレイヤのリストを取得
-    """
-
 
     #シェープファイルを保存するフォルダ指定の処理
     def OpenBrowse_save(self):
@@ -723,27 +591,6 @@ class ImportCSV:
                 QMessageBox.information(None, "情報", "保存しました。", QMessageBox.Ok)
                 progress.reset() #プログレスバーの進捗率をリセット
 
-        #layers = QgsProject.instance().mapLayers().items() #全てのレイヤインスタンスにアクセス
-        #layers = self.iface.mapCanvas().layers() # 追加されているレイヤのリストを取得    
-        #layers = QgsProject.instance().mapLayers().values() #レイヤーをすべて一覧する
-        #layers = QgsProject.instance().layerTreeRoot().findLayers()        
-        #layer = self.iface.activeLayer() ##アクティブレイヤを取得
-        
-        #QgsVectorFileWriter.writeAsVectorFormat(layer,"/path/to/folder/my_esridata","UTF-8",driverName="ESRI Shapefile")
-        #QgsVectorFileWriter.writeAsVectorFormat(layer, "my_shapes.shp", "CP1250", None, "ESRI Shapefile")
-
-
-    def Help_importClicked(self):
-        self.dlg2.show()
-        
-
-    def Help_polygonClicked(self):
-        self.dlg3.show()
-
-
-    def Help_saveClicked(self):
-        self.dlg4.show()
-
 
     #シングルポリゴンのレイヤ作成選択コンボボックスの処理
     def SinpolyCombobox(self):
@@ -764,5 +611,15 @@ class ImportCSV:
             self.dlg.label_5.setEnabled(True)
             self.dlg.lineEdit_Layername_multipoly.setEnabled(True)
 
+
+    #ヘルプウィンドウを開く処理    
+    def Help_importClicked(self):
+        self.dlg2.show()        
+
+    def Help_polygonClicked(self):
+        self.dlg3.show()
+
+    def Help_saveClicked(self):
+        self.dlg4.show()
 
     
