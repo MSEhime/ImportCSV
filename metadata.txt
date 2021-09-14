@@ -24,7 +24,7 @@ changelog=1.0 (20210916)
     ...First version
 
 # Tags are comma separated with spaces allowed
-tags=python,CSV,polygon,japan
+tags=python,CSV,polygon,point,japan
 
 homepage=http://www.microsystem-j.com/
 category=Vector
